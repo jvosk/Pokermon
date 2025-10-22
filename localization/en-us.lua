@@ -1520,9 +1520,9 @@ return {
             j_poke_gastly = {
                 name = 'Gastly',      
                 text = {
-                    "{C:green}#1# in #2#{} chance to {C:attention}replace{} the",
-                    "edition of a random {C:attention}Joker{} with",
-                    "{C:dark_edition}Negative{} at end of round",
+                    "{C:green}#1# in #2#{} chance to add",
+                    "{C:dark_edition}Negative{} to a random {C:attention}Joker{}",
+                    "at end of round",
                     "{S:1.1,C:red,E:2}self destructs{}",
                     "{C:inactive,s:0.8}(Evolves after {C:attention,s:0.8}#3#{C:inactive,s:0.8} rounds)",
                 } 
@@ -1530,9 +1530,9 @@ return {
             j_poke_haunter = {
                 name = 'Haunter',      
                 text = {
-                    "{C:green}#1# in #2#{} chance to {C:attention}replace{} the",
-                    "edition of a random {C:attention}Joker{} with",
-                    "{C:dark_edition}Negative{} at end of round",
+                    "{C:green}#1# in #2#{} chance to add",
+                    "{C:dark_edition}Negative{} to a random {C:attention}Joker{}",
+                    "at end of round",
                     "{S:1.1,C:red,E:2}self destructs{}",
                     "{C:inactive,s:0.8}(Evolves with a {C:attention,s:0.8}Linking Cord{C:inactive,s:0.8})"
                 } 
@@ -1540,11 +1540,10 @@ return {
             j_poke_gengar = {
                 name = 'Gengar',      
                 text = {
-                    "{C:attention}Replace{} the edition of a",
-                    "random {C:attention}Joker{} with",
-                    "{C:dark_edition}Negative{} in {C:dark_edition}#1#{} rounds",
-                    "{C:inactive,s:0.8}(Gengar picks a new number!){}",
-                    "{C:inactive,s:0.8}(Excludes Gengars){}",
+                    "{C:green}#1# in #2#{} chance to add",
+                    "{C:dark_edition}Negative{} to a random {C:attention}Joker{}",
+                    "at end of round",
+                    "{C:inactive,s:0.8}(Excludes self){}",
                 } 
             },
             j_poke_mega_gengar = {

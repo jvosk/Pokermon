@@ -65,7 +65,7 @@ local gastly={
       if #G.jokers.cards > 0 then
         local eligible_editionless_jokers = {}
         for k, v in pairs(G.jokers.cards) do
-          if v.ability.set == 'Joker' and v ~= card and not v.gone then
+          if v.ability.set == 'Joker' and (not v.edition) and v ~= card and not v.gone then
               table.insert(eligible_editionless_jokers, v)
           end
         end
@@ -123,7 +123,7 @@ local haunter={
       if #G.jokers.cards > 0 then
         local eligible_editionless_jokers = {}
         for k, v in pairs(G.jokers.cards) do
-          if v.ability.set == 'Joker' and v ~= card and not v.gone then
+          if v.ability.set == 'Joker' and (not v.edition) and v ~= card and not v.gone then
               table.insert(eligible_editionless_jokers, v)
           end
         end
@@ -132,7 +132,7 @@ local haunter={
           local edition = {negative = true}
           eligible_card:set_edition(edition, true)
         else
-          eligible_card = pseudorandom_element(G.jokers.cards, pseudoseed('gastly'))
+          eligible_card = pseudorandom_element(G.jokers.cards, pseudoseed('haunter'))
           local edition = {negative = true}
           eligible_card:set_edition(edition, true)
         end
@@ -148,7 +148,7 @@ local haunter={
 local gengar={
   name = "gengar", 
   pos = {x = 2, y = 7}, 
-  config = {extra = {gengar_rounds = 5, trigger = false}},
+  config = {extra = {num = 1, dem = 4}},
   loc_vars = function(self, info_queue, center)
     type_tooltip(self, info_queue, center)
     if pokermon_config.detailed_tooltips then
@@ -169,53 +169,18 @@ local gengar={
   gen = 1,
   eternal_compat = true,
   blueprint_compat = false,
-  calculate = function(self, card, context)
-    if context.end_of_round and not context.individual and not context.repetition and not context.blueprint then
-      card.ability.extra.gengar_rounds = card.ability.extra.gengar_rounds - 1
-      if card.ability.extra.gengar_rounds ~= 0 then
-        card_eval_status_text(card, 'extra', nil, nil, nil, {message = localize("poke_nasty_plot_ex"), colour = G.C.PURPLE})
-      end
-      if card.ability.extra.gengar_rounds == 0 then
-        card.ability.extra.trigger = true
-        
-        local gengar_chance = pseudorandom('gengar')
-        if gengar_chance < .05 then card.ability.extra.gengar_rounds = 2
-        elseif gengar_chance < .15 then card.ability.extra.gengar_rounds = 3
-        elseif gengar_chance < .35 then card.ability.extra.gengar_rounds = 4
-        elseif gengar_chance < .65 then card.ability.extra.gengar_rounds = 5
-        elseif gengar_chance < .85 then card.ability.extra.gengar_rounds = 6
-        elseif gengar_chance < .95 then card.ability.extra.gengar_rounds = 7
-        else card.ability.extra.gengar_rounds = 8
-        end
-      end
-    end
-  end,
-  set_ability = function(self, card, initial, delay_sprites)
-    if initial then
-      local gengar_chance = pseudorandom('gengar')
-      if gengar_chance < .05 then card.ability.extra.gengar_rounds = 2
-      elseif gengar_chance < .15 then card.ability.extra.gengar_rounds = 3
-      elseif gengar_chance < .35 then card.ability.extra.gengar_rounds = 4
-      elseif gengar_chance < .65 then card.ability.extra.gengar_rounds = 5
-      elseif gengar_chance < .85 then card.ability.extra.gengar_rounds = 6
-      elseif gengar_chance < .95 then card.ability.extra.gengar_rounds = 7
-      else card.ability.extra.gengar_rounds = 8
-      end
-    end
-  end,
   calc_dollar_bonus = function(self, card)
     local eligible_card = nil
-    if card.ability.extra.trigger then
-      card.ability.extra.trigger = false
+    if SMODS.pseudorandom_probability(card, 'gengar', card.ability.extra.num, card.ability.extra.dem, 'gengar') then
       if #G.jokers.cards > 0 then
-        local eligible_jokers = {}
+        local eligible_editionless_jokers = {}
         for k, v in pairs(G.jokers.cards) do
-          if v.ability.set == 'Joker' and v.ability.name ~= "gengar" and not v.gone then
-              table.insert(eligible_jokers, v)
+          if v.ability.set == 'Joker' and (not v.edition) and v ~= card and not v.gone then
+              table.insert(eligible_editionless_jokers, v)
           end
         end
-        if #eligible_jokers > 0 then
-          eligible_card = pseudorandom_element(eligible_jokers, pseudoseed('gengar'))
+        if #eligible_editionless_jokers > 0 then
+          eligible_card = pseudorandom_element(eligible_editionless_jokers, pseudoseed('gengar'))
           local edition = {negative = true}
           eligible_card:set_edition(edition, true)
           card_eval_status_text(eligible_card, 'extra', nil, nil, nil, {message = localize("poke_lick_ex"), colour = G.C.PURPLE})
