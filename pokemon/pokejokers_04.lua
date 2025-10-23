@@ -159,7 +159,8 @@ local gengar={
     if pokermon_config.detailed_tooltips then
       info_queue[#info_queue+1] = {set = 'Other', key = 'mega_poke'}
     end
-    return {vars = {center.ability.extra.gengar_rounds}}
+    local num, dem = SMODS.get_probability_vars(center, center.ability.extra.num, center.ability.extra.dem, 'gengar')
+    return {vars = {num, dem}}
   end,
   rarity = "poke_safari", 
   cost = 10, 
