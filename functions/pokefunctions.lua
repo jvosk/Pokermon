@@ -218,11 +218,12 @@ type_sticker_applied = function(card)
   
 end
 
-find_pokemon_type = function(target_type)
+find_pokemon_type = function(target_type, exclude_card)
   local found = {}
   if G.jokers and G.jokers.cards then
     for k, v in pairs(G.jokers.cards) do
-      if v.ability and ((v.ability.extra and type(v.ability.extra) == "table" and target_type == v.ability.extra.ptype) or v.ability[string.lower(target_type).."_sticker"]) then
+      if v.ability and ((v.ability.extra and type(v.ability.extra) == "table" and target_type == v.ability.extra.ptype) or v.ability[string.lower(target_type).."_sticker"]) 
+      and v ~= exclude_card then
         table.insert(found, v)
       end
     end
@@ -267,6 +268,12 @@ copy_scaled_values = function(card)
 end
 
 remove = function(self, card, context, check_shiny)
+  card.getting_sliced = true
+  local flags = SMODS.calculate_context({ joker_type_destroyed = true, card = card })
+  if flags.no_destroy then
+    card.getting_sliced = nil
+    return
+  end
   if check_shiny and card.edition and card.edition.poke_shiny then
     SMODS.change_booster_limit(-1)
   end
@@ -340,6 +347,7 @@ end
 poke_backend_evolve = function(card, to_key)
   local custom_values_to_keep = {}
   local has_custom_values_to_keep = nil
+  local trigger_add = nil
   local new_card = G.P_CENTERS[to_key]
   if card.config.center == new_card then return end
   
@@ -353,6 +361,7 @@ poke_backend_evolve = function(card, to_key)
   
   -- if it's not a mega and not a devolution and still has rounds left, reset perish tally
   if card.ability.perishable and card.config.center.rarity ~= "poke_mega" then
+    if card.ability.perish_tally == 0 then trigger_add = true end
     card.ability.perish_tally = G.GAME.perishable_rounds
     card.debuff = false
   end
@@ -449,7 +458,11 @@ poke_backend_evolve = function(card, to_key)
       G.P_CENTERS.e_poke_shiny.on_load(card)
     end
   end
-
+  
+  if trigger_add then
+    card:add_to_deck()
+  end
+  
   -- can be removed once this PR has been merged:
   --    https://github.com/Steamodded/smods/pull/611
   local to_fix = {}
@@ -1121,19 +1134,9 @@ get_random_poke_key = function(pseed, stage, pokerarity, area, poketype, exclude
     
   for k, v in pairs(G.P_CENTERS) do
     if v.stage and v.stage ~= "Other" and not (stage and v.stage ~= stage) and not (pokerarity and v.rarity ~= pokerarity) and get_gen_allowed(v)
-       and not (poketype and poketype ~= v.ptype) and pokemon_in_pool(v) and not v.aux_poke and v.rarity ~= "poke_mega" and not exclude_keys[v.key]
-       and not G.GAME.banned_keys[v.key] then
-      local no_dup = true
-      if G.jokers and G.jokers.cards and not next(find_joker("Showman")) then
-        for l, m in pairs(G.jokers.cards) do
-          if v.key == m.config.center_key then
-            no_dup = false
-          end
-        end
-      end
-      if no_dup then
-        table.insert(poke_keys, v.key)
-      end
+       and not (poketype and poketype ~= v.ptype) and v:in_pool() and not v.aux_poke and v.rarity ~= "poke_mega" and not exclude_keys[v.key]
+       and not G.GAME.banned_keys[v.key] and not (G.GAME.used_jokers[v.key] and not SMODS.showman(v.key)) then
+      table.insert(poke_keys, v.key)
     end
   end
   
@@ -1634,6 +1637,18 @@ poke_create_treasure = function(card, seed, megastone)
       }))
     end
   end
+end
+
+get_ancient_amount = function(hand, id, append_to_card)
+  local count = 0
+  for i = 1, #hand do
+    if hand[i]:get_id() == id then count = count + 1 end
+  end
+  
+  if append_to_card then
+    append_to_card.ability.extra.ancient_count = count
+  end
+  return count
 end
 
 --[[ Putting this here for later use

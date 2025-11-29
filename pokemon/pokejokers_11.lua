@@ -13,6 +13,7 @@ local aron = {
   gen = 3,
   ptype = "Metal",
   blueprint_compat = true,
+  perishable_compat = false,
   enhancement_gate = 'm_steel',
   loc_vars = function(self, info_queue, center)
     type_tooltip(self, info_queue, center)
@@ -60,6 +61,7 @@ local lairon = {
   gen = 3,
   ptype = "Metal",
   blueprint_compat = true,
+  perishable_compat = false,
   loc_vars = function(self, info_queue, center)
     type_tooltip(self, info_queue, center)
     if pokermon_config.detailed_tooltips then
@@ -108,6 +110,7 @@ local aggron = {
   gen = 3,
   ptype = "Metal",
   blueprint_compat = true,
+  perishable_compat = false,
   loc_vars = function(self, info_queue, center)
     type_tooltip(self, info_queue, center)
     if pokermon_config.detailed_tooltips then
@@ -211,6 +214,10 @@ local camerupt={
   config = {extra = {Xmult = 4, cards_scored = 0, score_goal = 20}},
   loc_vars = function(self, info_queue, center)
     type_tooltip(self, info_queue, center)
+    if pokermon_config.detailed_tooltips then
+      info_queue[#info_queue + 1] = {set = 'Other', key = 'mega_poke'}
+      info_queue[#info_queue+1] = G.P_CENTERS.m_mult
+    end
     return {vars = {center.ability.extra.Xmult, center.ability.extra.score_goal, math.max(0, center.ability.extra.score_goal - center.ability.extra.cards_scored)}}
   end,
   designer = "xtremepolymath",
@@ -259,6 +266,9 @@ local mega_camerupt={
   config = {extra = {Xmult = 1, Xmult2 = 1, Xmult_multi = 0.5}},
   loc_vars = function(self, info_queue, center)
     type_tooltip(self, info_queue, center)
+    if pokermon_config.detailed_tooltips then
+      info_queue[#info_queue+1] = G.P_CENTERS.m_mult
+    end
     return {vars = {center.ability.extra.Xmult, center.ability.extra.Xmult_multi}}
   end,
   designer = "xtremepolymath",

@@ -14,9 +14,10 @@ local ampharos={
   ptype = "Lightning",
   atlas = "Pokedex2",
   gen = 2,
-  perishable_compat = true,
+  perishable_compat = false,
   blueprint_compat = true,
   eternal_compat = true,
+  poke_custom_values_to_keep = {"Xmult"},
   calculate = function(self, card, context)
     if context.cardarea == G.jokers and context.scoring_hand then
       if context.joker_main and card.ability.extra.Xmult > 0 and card.ability.extra.Xmult ~= 1  then
@@ -52,6 +53,7 @@ local mega_ampharos={
   perishable_compat = true,
   blueprint_compat = false,
   eternal_compat = true,
+  poke_custom_values_to_keep = {"Xmult"},
   calculate = function(self, card, context)
     if context.setting_blind and not context.blueprint then
       if G.hand.config.card_limit < math.ceil(#G.deck.cards/2) then
@@ -350,7 +352,6 @@ local politoed={
       local scoring_suit = G.GAME.poke_poli_suit or "Spades"
       if context.other_card:is_suit(scoring_suit) then
         return {
-          message = localize{type = 'variable', key = 'a_mult', vars = {card.ability.extra.mult}}, 
           colour = G.C.MULT,
           mult = card.ability.extra.mult,
           card = card
@@ -362,9 +363,9 @@ local politoed={
       if context.other_card:is_suit(scoring_suit) then
         local total = #find_pokemon_type("Water")
         local cards = #context.scoring_hand
-        local pos
-        local remainder
-        local retriggers
+        local pos = 0
+        local remainder = 0
+        local retriggers = 0
         for i=1, #context.scoring_hand do
           if context.scoring_hand[i] == context.other_card then
             pos = i
@@ -374,11 +375,13 @@ local politoed={
         retriggers = math.floor(total/cards)
         remainder = total % cards
         if pos <= remainder then retriggers = retriggers + 1 end
-        return {
-          message = localize('k_again_ex'),
-          repetitions = retriggers,
-          card = card
-        }
+        if retriggers > 0 then
+          return {
+            message = localize('k_again_ex'),
+            repetitions = retriggers,
+            card = card
+          }
+        end
       end
     end
   end,
@@ -964,7 +967,7 @@ local misdreavus = {
   atlas = "Pokedex2",
   gen = 2,
   item_req = "duskstone",
-  perishable_compat = true,
+  perishable_compat = false,
   blueprint_compat = true,
   eternal_compat = true,
   calculate = function(self, card, context)
